@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
+using static UnityEngine.Rendering.DebugUI.Table;
 
 public enum PlayerOption
 {
@@ -13,6 +15,7 @@ public class TTT : MonoBehaviour
 {
     public int Rows;
     public int Columns;
+    public int turns;
     [SerializeField] BoardView board;
 
     PlayerOption currentPlayer = PlayerOption.X;
@@ -37,7 +40,108 @@ public class TTT : MonoBehaviour
 
     public void MakeOptimalMove()
     {
+        int randomNum = Random.Range(1, 9);
+        Debug.Log(randomNum);
+        switch (turns)
+        {
+            case 1:
+                if(randomNum == 1 || randomNum == 2)
+                {
+                    cells[0, 0].current = currentPlayer; //top left corner
+                    board.UpdateCellVisual(0, 0, currentPlayer);
+                    EndTurn();
+                }
+                else if(randomNum == 3 || randomNum == 4)
+                {
+                    cells[0, 2].current = currentPlayer; //bottom left corner
+                    board.UpdateCellVisual(0, 2, currentPlayer);
+                    EndTurn();
+                }
+                else if (randomNum == 5 || randomNum == 6)
+                {
+                    cells[2, 0].current = currentPlayer; //top right corner
+                    board.UpdateCellVisual(2, 0, currentPlayer);
+                    EndTurn();
+                }
+                else
+                {
+                    cells[2, 2].current = currentPlayer; //bottom right corner
+                    board.UpdateCellVisual(2, 2, currentPlayer);
+                    EndTurn();
+                }
+                break;
+            case 2:
+                if (cells[1, 1].current == PlayerOption.NONE)
+                {
+                    cells[1, 1].current = currentPlayer;
+                    board.UpdateCellVisual(1, 1, currentPlayer);
+                    EndTurn();
+                }
+                else
+                {
+                    if (randomNum == 1 || randomNum == 2)
+                    {
+                        cells[0, 0].current = currentPlayer; //top left corner
+                        board.UpdateCellVisual(0, 0, currentPlayer);
+                        EndTurn();
+                    }
+                    else if (randomNum == 3 || randomNum == 4)
+                    {
+                        cells[0, 2].current = currentPlayer; //bottom left corner
+                        board.UpdateCellVisual(0, 2, currentPlayer);
+                        EndTurn();
+                    }
+                    else if (randomNum == 5 || randomNum == 6)
+                    {
+                        cells[2, 0].current = currentPlayer; //top right corner
+                        board.UpdateCellVisual(2, 0, currentPlayer);
+                        EndTurn();
+                    }
+                    else
+                    {
+                        cells[2, 2].current = currentPlayer; //bottom right corner
+                        board.UpdateCellVisual(2, 2, currentPlayer);
+                        EndTurn();
+                    }
+                }
+                break;
+            case 3:
+                if (cells[1, 1].current == PlayerOption.O)
+                {
+                    if (cells[0, 0].current == PlayerOption.X) //top left
+                    {
+                        cells[2,2].current = currentPlayer; //bottom right
+                        board.UpdateCellVisual(2, 2, currentPlayer);
+                        EndTurn();
+                    }
+                    else if (cells[0, 2].current == PlayerOption.X) //bottom left
+                    {
+                        cells[2, 0].current = currentPlayer; //top right
+                        board.UpdateCellVisual(2, 0, currentPlayer);
+                        EndTurn();
+                    }
+                    else if (cells[2, 0].current == PlayerOption.X) //top right
+                    {
+                        cells[0, 2].current = currentPlayer; //bottom left
+                        board.UpdateCellVisual(0, 2, currentPlayer);
+                        EndTurn();
+                    }
+                    else
+                    {
+                        cells[0, 0].current = currentPlayer; //top left
+                        board.UpdateCellVisual(0, 0, currentPlayer);
+                        EndTurn();
+                    }
+                }
+                else if (cells[0, 1].current == PlayerOption.O || cells[1, 0].current == PlayerOption.O || cells[1, 2].current == PlayerOption.O || cells[2, 1].current == PlayerOption.O) //left mid, top mid, bottom mid, right mid: in that order 
+                {
+                    cells[1,1].current = currentPlayer;
+                    board.UpdateCellVisual(1, 1, currentPlayer);
+                    EndTurn();
+                }
+                break;
 
+        }
     }
 
     public void ChooseSpace(int column, int row)
@@ -69,6 +173,7 @@ public class TTT : MonoBehaviour
     {
         // increment player, if it goes over player 2, loop back to player 1
         currentPlayer += 1;
+        turns += 1;
         if ((int)currentPlayer > 2)
             currentPlayer = PlayerOption.X;
     }
