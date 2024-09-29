@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using static UnityEngine.Rendering.DebugUI.Table;
 
@@ -42,6 +43,10 @@ public class TTT : MonoBehaviour
     {
         int randomNum = Random.Range(1, 9);
         Debug.Log(randomNum);
+        int sum = 0;
+        int tempRow = 0;
+        int tempCol = 0;
+        int escapeVal = 0;
         switch (turns)
         {
             case 1: //puts X on a corner (randomly)
@@ -420,113 +425,1434 @@ public class TTT : MonoBehaviour
                         EndTurn();
                     }
                 }
-                else if (cells[0,0].current == PlayerOption.X && cells[1,0].current == PlayerOption.X && cells[2,0].current == PlayerOption.NONE)
+                else
                 {
-                    cells[2, 0].current = currentPlayer;
-                    board.UpdateCellVisual(2,0,currentPlayer);
+                    // check rows
+                    for (int i = 0; i < Rows; i++)
+                    {
+                        sum = 0;
+                        for (int j = 0; j < Columns; j++)
+                        {
+                            var value = 0;
+                            if (cells[j, i].current == PlayerOption.X)
+                                value = 1;
+                            else if (cells[j, i].current == PlayerOption.O)
+                                value = -1;
+                            else if (cells[j,i].current == PlayerOption.NONE)
+                            {
+                                tempRow = i;
+                                tempCol = j;
+                            }    
+
+                            sum += value;
+                        }
+
+                        if (sum == 2)
+                        {
+                            cells[tempCol, tempRow].current = PlayerOption.O;
+                            board.UpdateCellVisual(tempCol, tempRow, currentPlayer);
+                            break;
+                        }
+
+                    }
+
+                    // check columns
+                    for (int j = 0; j < Columns; j++)
+                    {
+                        sum = 0;
+                        for (int i = 0; i < Rows; i++)
+                        {
+                            var value = 0;
+                            if (cells[j, i].current == PlayerOption.X)
+                                value = 1;
+                            else if (cells[j, i].current == PlayerOption.O)
+                                value = -1;
+                            else if (cells[j, i].current == PlayerOption.NONE)
+                            {
+                                tempRow = i;
+                                tempCol = j;
+                            }
+
+                            sum += value;
+                        }
+
+                        if (sum == 2)
+                        {
+                            cells[tempCol, tempRow].current = PlayerOption.O;
+                            board.UpdateCellVisual(tempCol, tempRow, currentPlayer);
+                            break;
+                        }
+
+                    }
+
+                    // check diagonals
+                    // top left to bottom right
+                    sum = 0;
+                    for (int i = 0; i < Rows; i++)
+                    {
+                        int value = 0;
+                        if (cells[i, i].current == PlayerOption.X)
+                            value = 1;
+                        else if (cells[i, i].current == PlayerOption.O)
+                            value = -1;
+                        else if (cells[i, i].current == PlayerOption.NONE)
+                        {
+                            tempRow = i;
+                            tempCol = i;
+                        }
+
+                        sum += value;
+                    }
+
+                    if (sum == 2)
+                    {
+                        cells[tempCol, tempRow].current = PlayerOption.O;
+                        board.UpdateCellVisual(tempCol, tempRow, currentPlayer);
+                        break;
+                    }
+
+                    // top right to bottom left
+                    sum = 0;
+                    for (int i = 0; i < Rows; i++)
+                    {
+                        int value = 0;
+
+                        if (cells[Columns - 1 - i, i].current == PlayerOption.X)
+                            value = 1;
+                        else if (cells[Columns - 1 - i, i].current == PlayerOption.O)
+                            value = -1;
+                        else if (cells[Columns - 1 - i, i].current == PlayerOption.NONE)
+                        {
+                            tempRow = i;
+                            tempCol = i;
+                        }
+
+                        sum += value;
+                    }
+
+                    if (sum == 2)
+                    {
+                        cells[tempCol, tempRow].current = PlayerOption.O;
+                        board.UpdateCellVisual(tempCol, tempRow, currentPlayer);
+                        break;
+                    }
                     EndTurn();
                 }
-                else if (cells[0, 0].current == PlayerOption.X && cells[1, 0].current == PlayerOption.NONE && cells[2, 0].current == PlayerOption.X)
-                {
-                    cells[1,0].current = currentPlayer;
-                    board.UpdateCellVisual(1,0,currentPlayer);
-                    EndTurn();
+                break;
+            case 5:
+                sum = 0;
+                tempRow = 0;
+                tempCol = 0;
+                // tries to win
+                // check rows
+                for (int i = 0; i < Rows; i++)
+                    {
+                        sum = 0;
+                        for (int j = 0; j < Columns; j++)
+                        {
+                            var value = 0;
+                            if (cells[j, i].current == PlayerOption.X)
+                                value = 1;
+                            else if (cells[j, i].current == PlayerOption.O)
+                                value = -1;
+                            else if (cells[j, i].current == PlayerOption.NONE)
+                            {
+                                tempRow = i;
+                                tempCol = j;
+                            }
+
+                            sum += value;
+                        }
+
+                        if (sum == 2)
+                        {
+                            cells[tempCol, tempRow].current = currentPlayer;
+                            board.UpdateCellVisual(tempCol, tempRow, currentPlayer);
+                            EndTurn();
+                            break;
+                        }
+
                 }
-                else if (cells[0, 0].current == PlayerOption.NONE && cells[1, 0].current == PlayerOption.X && cells[2, 0].current == PlayerOption.X)
+                // check columns
+                for (int j = 0; j < Columns; j++)
                 {
-                    cells[0, 0].current = currentPlayer;
-                    board.UpdateCellVisual(0, 0, currentPlayer);
-                    EndTurn();
+                    sum = 0;
+                    for (int i = 0; i < Rows; i++)
+                    {
+                        var value = 0;
+                        if (cells[j, i].current == PlayerOption.X)
+                            value = 1;
+                        else if (cells[j, i].current == PlayerOption.O)
+                            value = -1;
+                        else if (cells[j, i].current == PlayerOption.NONE)
+                        {
+                            tempRow = i;
+                            tempCol = j;
+                        }
+
+                        sum += value;
+                    }
+
+                    if (sum == 2)
+                    {
+                        cells[tempCol, tempRow].current = currentPlayer;
+                        board.UpdateCellVisual(tempCol, tempRow, currentPlayer);
+                        EndTurn();
+                        break;
+                    }
+
                 }
-                else if (cells[0, 1].current == PlayerOption.NONE && cells[1, 1].current == PlayerOption.X && cells[2, 1].current == PlayerOption.X)
+                // check diagonals
+                // top left to bottom right
+                sum = 0;
+                for (int i = 0; i < Rows; i++)
                 {
-                    cells[0, 1].current = currentPlayer;
-                    board.UpdateCellVisual(0, 1, currentPlayer);
-                    EndTurn();
+                    int value = 0;
+                    if (cells[i, i].current == PlayerOption.X)
+                        value = 1;
+                    else if (cells[i, i].current == PlayerOption.O)
+                        value = -1;
+                    else if (cells[i, i].current == PlayerOption.NONE)
+                    {
+                        tempRow = i;
+                        tempCol = i;
+                    }
+
+                    sum += value;
                 }
-                else if (cells[0, 1].current == PlayerOption.X && cells[1, 1].current == PlayerOption.NONE && cells[2, 1].current == PlayerOption.X)
+
+                if (sum == 2)
                 {
-                    cells[1, 1].current = currentPlayer;
-                    board.UpdateCellVisual(1, 1, currentPlayer);
+                    cells[tempCol, tempRow].current = currentPlayer;
+                    board.UpdateCellVisual(tempCol, tempRow, currentPlayer);
                     EndTurn();
+                    break;
                 }
-                else if (cells[0, 1].current == PlayerOption.X && cells[1, 1].current == PlayerOption.X && cells[2, 1].current == PlayerOption.NONE)
+                // top right to bottom left
+                sum = 0;
+                for (int i = 0; i < Rows; i++)
                 {
-                    cells[2, 1].current = currentPlayer;
-                    board.UpdateCellVisual(2, 1, currentPlayer);
-                    EndTurn();
+                    int value = 0;
+
+                    if (cells[Columns - 1 - i, i].current == PlayerOption.X)
+                        value = 1;
+                    else if (cells[Columns - 1 - i, i].current == PlayerOption.O)
+                        value = -1;
+                    else if (cells[Columns - 1 - i, i].current == PlayerOption.NONE)
+                    {
+                        tempRow = i;
+                        tempCol = (Columns - 1 - i);
+                    }
+
+                    sum += value;
                 }
-                else if (cells[0, 2].current == PlayerOption.NONE && cells[1, 2].current == PlayerOption.X && cells[2, 2].current == PlayerOption.X)
+
+                if (sum == 2)
                 {
-                    cells[0, 2].current = currentPlayer;
-                    board.UpdateCellVisual(0, 2, currentPlayer);
+                    cells[tempCol, tempRow].current = currentPlayer;
+                    board.UpdateCellVisual(tempCol, tempRow, currentPlayer);
                     EndTurn();
+                    break;
                 }
-                else if (cells[0, 2].current == PlayerOption.X && cells[1, 2].current == PlayerOption.NONE && cells[2, 2].current == PlayerOption.X)
+                //ties if can't win
+                // check rows
+                for (int i = 0; i < Rows; i++)
                 {
-                    cells[1, 2].current = currentPlayer;
-                    board.UpdateCellVisual(1, 2, currentPlayer);
-                    EndTurn();
+                    sum = 0;
+                    for (int j = 0; j < Columns; j++)
+                    {
+                        var value = 0;
+                        if (cells[j, i].current == PlayerOption.X)
+                            value = 1;
+                        else if (cells[j, i].current == PlayerOption.O)
+                            value = -1;
+                        else if (cells[j, i].current == PlayerOption.NONE)
+                        {
+                            tempRow = i;
+                            tempCol = j;
+                        }
+
+                        sum += value;
+                    }
+
+                    if (sum == -2)
+                    {
+                        cells[tempCol, tempRow].current = currentPlayer;
+                        board.UpdateCellVisual(tempCol, tempRow, currentPlayer);
+                        EndTurn();
+                        break;
+                    }
+
                 }
-                else if (cells[0, 2].current == PlayerOption.X && cells[1, 2].current == PlayerOption.X && cells[2, 2].current == PlayerOption.NONE)
+                // check columns
+                for (int j = 0; j < Columns; j++)
                 {
-                    cells[2, 2].current = currentPlayer;
-                    board.UpdateCellVisual(2, 2, currentPlayer);
-                    EndTurn();
+                    sum = 0;
+                    for (int i = 0; i < Rows; i++)
+                    {
+                        var value = 0;
+                        if (cells[j, i].current == currentPlayer)
+                            value = 1;
+                        else if (cells[j, i].current == PlayerOption.O)
+                            value = -1;
+                        else if (cells[j, i].current == PlayerOption.NONE)
+                        {
+                            tempRow = i;
+                            tempCol = j;
+                        }
+
+                        sum += value;
+                    }
+
+                    if (sum == -2)
+                    {
+                        cells[tempCol, tempRow].current = currentPlayer;
+                        board.UpdateCellVisual(tempCol, tempRow, currentPlayer);
+                        EndTurn();
+                        break;
+                    }
+
                 }
-                else if (cells[0, 0].current == PlayerOption.NONE && cells[0, 1].current == PlayerOption.X && cells[0, 2].current == PlayerOption.X)
+                // check diagonals
+                // top left to bottom right
+                sum = 0;
+                for (int i = 0; i < Rows; i++)
                 {
-                    cells[0, 0].current = currentPlayer;
-                    board.UpdateCellVisual(0, 0, currentPlayer);
-                    EndTurn();
+                    int value = 0;
+                    if (cells[i, i].current == PlayerOption.X)
+                        value = 1;
+                    else if (cells[i, i].current == PlayerOption.O)
+                        value = -1;
+                    else if (cells[i, i].current == PlayerOption.NONE)
+                    {
+                        tempRow = i;
+                        tempCol = i;
+                    }
+
+                    sum += value;
                 }
-                else if (cells[0, 0].current == PlayerOption.X && cells[0, 1].current == PlayerOption.NONE && cells[0, 2].current == PlayerOption.X)
+
+                if (sum == -2)
                 {
-                    cells[0, 1].current = currentPlayer;
-                    board.UpdateCellVisual(0, 1, currentPlayer);
+                    cells[tempCol, tempRow].current = currentPlayer;
+                    board.UpdateCellVisual(tempCol, tempRow, currentPlayer);
                     EndTurn();
+                    break;
                 }
-                else if (cells[0, 0].current == PlayerOption.X && cells[0, 1].current == PlayerOption.X && cells[0, 2].current == PlayerOption.NONE)
+                    // top right to bottom left
+                    sum = 0;
+                for (int i = 0; i < Rows; i++)
                 {
-                    cells[0, 2].current = currentPlayer;
-                    board.UpdateCellVisual(0, 2, currentPlayer);
-                    EndTurn();
+                    int value = 0;
+
+                    if (cells[Columns - 1 - i, i].current == PlayerOption.X)
+                        value = 1;
+                    else if (cells[Columns - 1 - i, i].current == PlayerOption.O)
+                        value = -1;
+                    else if (cells[Columns - 1 - i, i].current == PlayerOption.NONE)
+                    {
+                        tempRow = i;
+                        tempCol = (Columns - 1 - i);
+                    }
+
+                    sum += value;
                 }
-                else if (cells[1, 0].current == PlayerOption.X && cells[1, 1].current == PlayerOption.X && cells[1, 2].current == PlayerOption.NONE)
+
+                if (sum == -2)
                 {
-                    cells[1, 2].current = currentPlayer;
-                    board.UpdateCellVisual(1, 2, currentPlayer);
+                    cells[tempCol, tempRow].current = currentPlayer;
+                    board.UpdateCellVisual(tempCol, tempRow, currentPlayer);
                     EndTurn();
+                    break;
                 }
-                else if (cells[1, 0].current == PlayerOption.X && cells[1, 1].current == PlayerOption.NONE && cells[1, 2].current == PlayerOption.X)
+                break;
+            case 6:
+                sum = 0;
+                tempRow = 0;
+                tempCol = 0;
+                escapeVal = 0;
+                while (currentPlayer == PlayerOption.O && escapeVal != 1)
                 {
-                    cells[1, 1].current = currentPlayer;
-                    board.UpdateCellVisual(1, 1, currentPlayer);
-                    EndTurn();
+                    //tries to win
+                    // check rows
+                    for (int i = 0; i < Rows; i++)
+                    {
+                        sum = 0;
+                        for (int j = 0; j < Columns; j++)
+                        {
+                            var value = 0;
+                            if (cells[j, i].current == PlayerOption.X)
+                                value = 1;
+                            else if (cells[j, i].current == PlayerOption.O)
+                                value = -1;
+                            else if (cells[j, i].current == PlayerOption.NONE)
+                            {
+                                tempRow = i;
+                                tempCol = j;
+                            }
+
+                            sum += value;
+                        }
+
+                        if (sum == -2)
+                        {
+                            cells[tempCol, tempRow].current = currentPlayer;
+                            board.UpdateCellVisual(tempCol, tempRow, currentPlayer);
+                            EndTurn();
+                            break;
+                        }
+
+                    }
+                    escapeVal = 1;
                 }
-                else if (cells[1, 0].current == PlayerOption.NONE && cells[1, 1].current == PlayerOption.X && cells[1, 2].current == PlayerOption.X)
+                escapeVal = 0;
+                while (currentPlayer == PlayerOption.O && escapeVal != 1)
                 {
-                    cells[1, 0].current = currentPlayer;
-                    board.UpdateCellVisual(1, 0, currentPlayer);
-                    EndTurn();
+                    // check columns
+                    for (int j = 0; j < Columns; j++)
+                    {
+                        sum = 0;
+                        for (int i = 0; i < Rows; i++)
+                        {
+                            var value = 0;
+                            if (cells[j, i].current == PlayerOption.X)
+                                value = 1;
+                            else if (cells[j, i].current == PlayerOption.O)
+                                value = -1;
+                            else if (cells[j, i].current == PlayerOption.NONE)
+                            {
+                                tempRow = i;
+                                tempCol = j;
+                            }
+
+                            sum += value;
+                        }
+
+                        if (sum == -2)
+                        {
+                            cells[tempCol, tempRow].current = currentPlayer;
+                            board.UpdateCellVisual(tempCol, tempRow, currentPlayer);
+                            EndTurn();
+                            break;
+                        }
+
+                    }
+                    escapeVal = 1;
                 }
-                else if (cells[2, 0].current == PlayerOption.X && cells[2, 1].current == PlayerOption.X && cells[2, 2].current == PlayerOption.NONE)
+                escapeVal = 0;
+                while (currentPlayer == PlayerOption.O && escapeVal != 1)
                 {
-                    cells[2, 2].current = currentPlayer;
-                    board.UpdateCellVisual(2, 2, currentPlayer);
-                    EndTurn();
+                    // check diagonals
+                    // top left to bottom right
+                    sum = 0;
+                    for (int i = 0; i < Rows; i++)
+                    {
+                        int value = 0;
+                        if (cells[i, i].current == PlayerOption.X)
+                            value = 1;
+                        else if (cells[i, i].current == PlayerOption.O)
+                            value = -1;
+                        else if (cells[i, i].current == PlayerOption.NONE)
+                        {
+                            tempRow = i;
+                            tempCol = i;
+                        }
+
+                        sum += value;
+                    }
+
+                    if (sum == -2)
+                    {
+                        cells[tempCol, tempRow].current = currentPlayer;
+                        board.UpdateCellVisual(tempCol, tempRow, currentPlayer);
+                        EndTurn();
+                        break;
+                    }
+                    escapeVal = 1;
                 }
-                else if (cells[2, 0].current == PlayerOption.X && cells[2, 1].current == PlayerOption.NONE && cells[2, 2].current == PlayerOption.X)
+                escapeVal = 0;
+                while (currentPlayer == PlayerOption.O && escapeVal != 1)
                 {
-                    cells[2, 1].current = currentPlayer;
-                    board.UpdateCellVisual(2, 1, currentPlayer);
-                    EndTurn();
+                    // top right to bottom left
+                    sum = 0;
+                    for (int i = 0; i < Rows; i++)
+                    {
+                        int value = 0;
+
+                        if (cells[Columns - 1 - i, i].current == PlayerOption.X)
+                            value = 1;
+                        else if (cells[Columns - 1 - i, i].current == PlayerOption.O)
+                            value = -1;
+                        else if (cells[Columns - 1 - i, i].current == PlayerOption.NONE)
+                        {
+                            tempRow = i;
+                            tempCol = (Columns - 1 - i);
+                        }
+
+                        sum += value;
+                    }
+
+                    if (sum == -2)
+                    {
+                        cells[tempCol, tempRow].current = currentPlayer;
+                        board.UpdateCellVisual(tempCol, tempRow, currentPlayer);
+                        EndTurn();
+                        break;
+                    }
+                    escapeVal = 1;
                 }
-                else if (cells[2, 0].current == PlayerOption.NONE && cells[2, 1].current == PlayerOption.X && cells[2, 2].current == PlayerOption.X)
+                escapeVal = 0;
+                while (currentPlayer == PlayerOption.O && escapeVal != 1)
                 {
-                    cells[2, 2].current = currentPlayer;
-                    board.UpdateCellVisual(2, 2, currentPlayer);
-                    EndTurn();
+                    // ties if can't win
+                    // check rows
+                    for (int i = 0; i < Rows; i++)
+                    {
+                        sum = 0;
+                        for (int j = 0; j < Columns; j++)
+                        {
+                            var value = 0;
+                            if (cells[j, i].current == PlayerOption.X)
+                                value = 1;
+                            else if (cells[j, i].current == PlayerOption.O)
+                                value = -1;
+                            else if (cells[j, i].current == PlayerOption.NONE)
+                            {
+                                tempRow = i;
+                                tempCol = j;
+                            }
+
+                            sum += value;
+                        }
+
+                        if (sum == 2)
+                        {
+                            cells[tempCol, tempRow].current = currentPlayer;
+                            board.UpdateCellVisual(tempCol, tempRow, currentPlayer);
+                            EndTurn();
+                            break;
+                        }
+
+                    }
+                    escapeVal = 1;
+                }
+                escapeVal = 0;
+                while (currentPlayer == PlayerOption.O && escapeVal != 1)
+                {
+                    // check columns
+                    for (int j = 0; j < Columns; j++)
+                    {
+                        sum = 0;
+                        for (int i = 0; i < Rows; i++)
+                        {
+                            var value = 0;
+                            if (cells[j, i].current == PlayerOption.X)
+                                value = 1;
+                            else if (cells[j, i].current == PlayerOption.O)
+                                value = -1;
+                            else if (cells[j, i].current == PlayerOption.NONE)
+                            {
+                                tempRow = i;
+                                tempCol = j;
+                            }
+
+                            sum += value;
+                        }
+
+                        if (sum == 2)
+                        {
+                            cells[tempCol, tempRow].current = currentPlayer;
+                            board.UpdateCellVisual(tempCol, tempRow, currentPlayer);
+                            EndTurn();
+                            break;
+                        }
+
+                    }
+                    escapeVal = 1;
+                }
+                escapeVal = 0;
+                while (currentPlayer == PlayerOption.O && escapeVal != 1)
+                {
+                    // check diagonals
+                    // top left to bottom right
+                    sum = 0;
+                    for (int i = 0; i < Rows; i++)
+                    {
+                        int value = 0;
+                        if (cells[i, i].current == PlayerOption.X)
+                            value = 1;
+                        else if (cells[i, i].current == PlayerOption.O)
+                            value = -1;
+                        else if (cells[i, i].current == PlayerOption.NONE)
+                        {
+                            tempRow = i;
+                            tempCol = i;
+                        }
+
+                        sum += value;
+                    }
+
+                    if (sum == 2)
+                    {
+                        cells[tempCol, tempRow].current = currentPlayer;
+                        board.UpdateCellVisual(tempCol, tempRow, currentPlayer);
+                        EndTurn();
+                        break;
+                    }
+                    escapeVal = 1;
+                }
+                escapeVal = 0;
+                while (currentPlayer == PlayerOption.O && escapeVal != 1)
+                {
+                    // top right to bottom left
+                    sum = 0;
+                    for (int i = 0; i < Rows; i++)
+                    {
+                        int value = 0;
+
+                        if (cells[Columns - 1 - i, i].current == PlayerOption.X)
+                            value = 1;
+                        else if (cells[Columns - 1 - i, i].current == PlayerOption.O)
+                            value = -1;
+                        else if (cells[Columns - 1 - i, i].current == PlayerOption.NONE)
+                        {
+                            tempRow = i;
+                            tempCol = (Columns - 1 - i);
+                        }
+
+                        sum += value;
+                    }
+
+                    if (sum == 2)
+                    {
+                        cells[tempCol, tempRow].current = currentPlayer;
+                        board.UpdateCellVisual(tempCol, tempRow, currentPlayer);
+                        EndTurn();
+                        break;
+                    }
+                    escapeVal = 1;
+                }
+                escapeVal = 0;
+                break;
+            case 7:
+                sum = 0;
+                tempRow = 0;
+                tempCol = 0;
+                escapeVal = 0;
+                while (currentPlayer == PlayerOption.X && escapeVal != 1)
+                {
+                    //tries to win
+                    // check rows
+                    for (int i = 0; i < Rows; i++)
+                    {
+                        sum = 0;
+                        for (int j = 0; j < Columns; j++)
+                        {
+                            var value = 0;
+                            if (cells[j, i].current == PlayerOption.X)
+                                value = 1;
+                            else if (cells[j, i].current == PlayerOption.O)
+                                value = -1;
+                            else if (cells[j, i].current == PlayerOption.NONE)
+                            {
+                                tempRow = i;
+                                tempCol = j;
+                            }
+
+                            sum += value;
+                        }
+
+                        if (sum == 2)
+                        {
+                            cells[tempCol, tempRow].current = currentPlayer;
+                            board.UpdateCellVisual(tempCol, tempRow, currentPlayer);
+                            EndTurn();
+                            break;
+                        }
+
+                    }
+                    escapeVal = 1;
+                }
+                escapeVal = 0;
+                while (currentPlayer == PlayerOption.X && escapeVal != 1)
+                {
+                    // check columns
+                    for (int j = 0; j < Columns; j++)
+                    {
+                        sum = 0;
+                        for (int i = 0; i < Rows; i++)
+                        {
+                            var value = 0;
+                            if (cells[j, i].current == PlayerOption.X)
+                                value = 1;
+                            else if (cells[j, i].current == PlayerOption.O)
+                                value = -1;
+                            else if (cells[j, i].current == PlayerOption.NONE)
+                            {
+                                tempRow = i;
+                                tempCol = j;
+                            }
+
+                            sum += value;
+                        }
+
+                        if (sum == 2)
+                        {
+                            cells[tempCol, tempRow].current = currentPlayer;
+                            board.UpdateCellVisual(tempCol, tempRow, currentPlayer);
+                            EndTurn();
+                            break;
+                        }
+
+                    }
+                    escapeVal = 1;
+                }
+                escapeVal = 0;
+                while (currentPlayer == PlayerOption.X && escapeVal != 1)
+                {
+                    // check diagonals
+                    // top left to bottom right
+                    sum = 0;
+                    for (int i = 0; i < Rows; i++)
+                    {
+                        int value = 0;
+                        if (cells[i, i].current == PlayerOption.X)
+                            value = 1;
+                        else if (cells[i, i].current == PlayerOption.O)
+                            value = -1;
+                        else if (cells[i, i].current == PlayerOption.NONE)
+                        {
+                            tempRow = i;
+                            tempCol = i;
+                        }
+
+                        sum += value;
+                    }
+
+                    if (sum == 2)
+                    {
+                        cells[tempCol, tempRow].current = currentPlayer;
+                        board.UpdateCellVisual(tempCol, tempRow, currentPlayer);
+                        EndTurn();
+                        break;
+                    }
+                    escapeVal = 1;
+                }
+                escapeVal = 0;
+                while (currentPlayer == PlayerOption.X && escapeVal != 1)
+                {
+                    // top right to bottom left
+                    sum = 0;
+                    for (int i = 0; i < Rows; i++)
+                    {
+                        int value = 0;
+
+                        if (cells[Columns - 1 - i, i].current == PlayerOption.X)
+                            value = 1;
+                        else if (cells[Columns - 1 - i, i].current == PlayerOption.O)
+                            value = -1;
+                        else if (cells[Columns - 1 - i, i].current == PlayerOption.NONE)
+                        {
+                            tempRow = i;
+                            tempCol = (Columns - 1 - i);
+                        }
+
+                        sum += value;
+                    }
+
+                    if (sum == 2)
+                    {
+                        cells[tempCol, tempRow].current = currentPlayer;
+                        board.UpdateCellVisual(tempCol, tempRow, currentPlayer);
+                        EndTurn();
+                        break;
+                    }
+                    escapeVal = 1;
+                }
+                escapeVal = 0;
+                while (currentPlayer == PlayerOption.X && escapeVal != 1)
+                {
+                    // ties if can't win
+                    // check rows
+                    for (int i = 0; i < Rows; i++)
+                    {
+                        sum = 0;
+                        for (int j = 0; j < Columns; j++)
+                        {
+                            var value = 0;
+                            if (cells[j, i].current == PlayerOption.X)
+                                value = 1;
+                            else if (cells[j, i].current == PlayerOption.O)
+                                value = -1;
+                            else if (cells[j, i].current == PlayerOption.NONE)
+                            {
+                                tempRow = i;
+                                tempCol = j;
+                            }
+
+                            sum += value;
+                        }
+
+                        if (sum == -2)
+                        {
+                            cells[tempCol, tempRow].current = currentPlayer;
+                            board.UpdateCellVisual(tempCol, tempRow, currentPlayer);
+                            EndTurn();
+                            break;
+                        }
+
+                    }
+                    escapeVal = 1;
+                }
+                escapeVal = 0;
+                while (currentPlayer == PlayerOption.X && escapeVal != 1)
+                {
+                    // check columns
+                    for (int j = 0; j < Columns; j++)
+                    {
+                        sum = 0;
+                        for (int i = 0; i < Rows; i++)
+                        {
+                            var value = 0;
+                            if (cells[j, i].current == PlayerOption.X)
+                                value = 1;
+                            else if (cells[j, i].current == PlayerOption.O)
+                                value = -1;
+                            else if (cells[j, i].current == PlayerOption.NONE)
+                            {
+                                tempRow = i;
+                                tempCol = j;
+                            }
+
+                            sum += value;
+                        }
+
+                        if (sum == -2)
+                        {
+                            cells[tempCol, tempRow].current = currentPlayer;
+                            board.UpdateCellVisual(tempCol, tempRow, currentPlayer);
+                            EndTurn();
+                            break;
+                        }
+
+                    }
+                    escapeVal = 1;
+                }
+                escapeVal = 0;
+                while (currentPlayer == PlayerOption.X && escapeVal != 1)
+                {
+                    // check diagonals
+                    // top left to bottom right
+                    sum = 0;
+                    for (int i = 0; i < Rows; i++)
+                    {
+                        int value = 0;
+                        if (cells[i, i].current == PlayerOption.X)
+                            value = 1;
+                        else if (cells[i, i].current == PlayerOption.O)
+                            value = -1;
+                        else if (cells[i, i].current == PlayerOption.NONE)
+                        {
+                            tempRow = i;
+                            tempCol = i;
+                        }
+
+                        sum += value;
+                    }
+
+                    if (sum == -2)
+                    {
+                        cells[tempCol, tempRow].current = currentPlayer;
+                        board.UpdateCellVisual(tempCol, tempRow, currentPlayer);
+                        EndTurn();
+                        break;
+                    }
+                    escapeVal = 1;
+                }
+                escapeVal = 0;
+                while (currentPlayer == PlayerOption.X && escapeVal != 1)
+                {
+                    // top right to bottom left
+                    sum = 0;
+                    for (int i = 0; i < Rows; i++)
+                    {
+                        int value = 0;
+
+                        if (cells[Columns - 1 - i, i].current == PlayerOption.X)
+                            value = 1;
+                        else if (cells[Columns - 1 - i, i].current == PlayerOption.O)
+                            value = -1;
+                        else if (cells[Columns - 1 - i, i].current == PlayerOption.NONE)
+                        {
+                            tempRow = i;
+                            tempCol = (Columns - 1 - i);
+                        }
+
+                        sum += value;
+                    }
+
+                    if (sum == -2)
+                    {
+                        cells[tempCol, tempRow].current = currentPlayer;
+                        board.UpdateCellVisual(tempCol, tempRow, currentPlayer);
+                        EndTurn();
+                        break;
+                    }
+                    escapeVal = 1;
+                }
+                escapeVal = 0;
+                break;
+            case 8:
+                sum = 0;
+                tempRow = 0;
+                tempCol = 0;
+                escapeVal = 0;
+                while (currentPlayer == PlayerOption.O && escapeVal != 1)
+                {
+                    //tries to win
+                    // check rows
+                    for (int i = 0; i < Rows; i++)
+                    {
+                        sum = 0;
+                        for (int j = 0; j < Columns; j++)
+                        {
+                            var value = 0;
+                            if (cells[j, i].current == PlayerOption.X)
+                                value = 1;
+                            else if (cells[j, i].current == PlayerOption.O)
+                                value = -1;
+                            else if (cells[j, i].current == PlayerOption.NONE)
+                            {
+                                tempRow = i;
+                                tempCol = j;
+                            }
+
+                            sum += value;
+                        }
+
+                        if (sum == -2)
+                        {
+                            cells[tempCol, tempRow].current = currentPlayer;
+                            board.UpdateCellVisual(tempCol, tempRow, currentPlayer);
+                            EndTurn();
+                            break;
+                        }
+
+                    }
+                    escapeVal = 1;
+                }
+                escapeVal = 0;
+                while (currentPlayer == PlayerOption.O && escapeVal != 1)
+                {
+                    // check columns
+                    for (int j = 0; j < Columns; j++)
+                    {
+                        sum = 0;
+                        for (int i = 0; i < Rows; i++)
+                        {
+                            var value = 0;
+                            if (cells[j, i].current == PlayerOption.X)
+                                value = 1;
+                            else if (cells[j, i].current == PlayerOption.O)
+                                value = -1;
+                            else if (cells[j, i].current == PlayerOption.NONE)
+                            {
+                                tempRow = i;
+                                tempCol = j;
+                            }
+
+                            sum += value;
+                        }
+
+                        if (sum == -2)
+                        {
+                            cells[tempCol, tempRow].current = currentPlayer;
+                            board.UpdateCellVisual(tempCol, tempRow, currentPlayer);
+                            EndTurn();
+                            break;
+                        }
+
+                    }
+                    escapeVal = 1;
+                }
+                escapeVal = 0;
+                while (currentPlayer == PlayerOption.O && escapeVal != 1)
+                {
+                    // check diagonals
+                    // top left to bottom right
+                    sum = 0;
+                    for (int i = 0; i < Rows; i++)
+                    {
+                        int value = 0;
+                        if (cells[i, i].current == PlayerOption.X)
+                            value = 1;
+                        else if (cells[i, i].current == PlayerOption.O)
+                            value = -1;
+                        else if (cells[i, i].current == PlayerOption.NONE)
+                        {
+                            tempRow = i;
+                            tempCol = i;
+                        }
+
+                        sum += value;
+                    }
+
+                    if (sum == -2)
+                    {
+                        cells[tempCol, tempRow].current = currentPlayer;
+                        board.UpdateCellVisual(tempCol, tempRow, currentPlayer);
+                        EndTurn();
+                        break;
+                    }
+                    escapeVal = 1;
+                }
+                escapeVal = 0;
+                while (currentPlayer == PlayerOption.O && escapeVal != 1)
+                {
+                    // top right to bottom left
+                    sum = 0;
+                    for (int i = 0; i < Rows; i++)
+                    {
+                        int value = 0;
+
+                        if (cells[Columns - 1 - i, i].current == PlayerOption.X)
+                            value = 1;
+                        else if (cells[Columns - 1 - i, i].current == PlayerOption.O)
+                            value = -1;
+                        else if (cells[Columns - 1 - i, i].current == PlayerOption.NONE)
+                        {
+                            tempRow = i;
+                            tempCol = (Columns - 1 - i);
+                        }
+
+                        sum += value;
+                    }
+
+                    if (sum == -2)
+                    {
+                        cells[tempCol, tempRow].current = currentPlayer;
+                        board.UpdateCellVisual(tempCol, tempRow, currentPlayer);
+                        EndTurn();
+                        break;
+                    }
+                    escapeVal = 1;
+                }
+                escapeVal = 0;
+                while (currentPlayer == PlayerOption.O && escapeVal != 1)
+                {
+                    // ties if can't win
+                    // check rows
+                    for (int i = 0; i < Rows; i++)
+                    {
+                        sum = 0;
+                        for (int j = 0; j < Columns; j++)
+                        {
+                            var value = 0;
+                            if (cells[j, i].current == PlayerOption.X)
+                                value = 1;
+                            else if (cells[j, i].current == PlayerOption.O)
+                                value = -1;
+                            else if (cells[j, i].current == PlayerOption.NONE)
+                            {
+                                tempRow = i;
+                                tempCol = j;
+                            }
+
+                            sum += value;
+                        }
+
+                        if (sum == 2)
+                        {
+                            cells[tempCol, tempRow].current = currentPlayer;
+                            board.UpdateCellVisual(tempCol, tempRow, currentPlayer);
+                            EndTurn();
+                            break;
+                        }
+
+                    }
+                    escapeVal = 1;
+                }
+                escapeVal = 0;
+                while (currentPlayer == PlayerOption.O && escapeVal != 1)
+                {
+                    // check columns
+                    for (int j = 0; j < Columns; j++)
+                    {
+                        sum = 0;
+                        for (int i = 0; i < Rows; i++)
+                        {
+                            var value = 0;
+                            if (cells[j, i].current == PlayerOption.X)
+                                value = 1;
+                            else if (cells[j, i].current == PlayerOption.O)
+                                value = -1;
+                            else if (cells[j, i].current == PlayerOption.NONE)
+                            {
+                                tempRow = i;
+                                tempCol = j;
+                            }
+
+                            sum += value;
+                        }
+
+                        if (sum == 2)
+                        {
+                            cells[tempCol, tempRow].current = currentPlayer;
+                            board.UpdateCellVisual(tempCol, tempRow, currentPlayer);
+                            EndTurn();
+                            break;
+                        }
+
+                    }
+                    escapeVal = 1;
+                }
+                escapeVal = 0;
+                while (currentPlayer == PlayerOption.O && escapeVal != 1)
+                {
+                    // check diagonals
+                    // top left to bottom right
+                    sum = 0;
+                    for (int i = 0; i < Rows; i++)
+                    {
+                        int value = 0;
+                        if (cells[i, i].current == PlayerOption.X)
+                            value = 1;
+                        else if (cells[i, i].current == PlayerOption.O)
+                            value = -1;
+                        else if (cells[i, i].current == PlayerOption.NONE)
+                        {
+                            tempRow = i;
+                            tempCol = i;
+                        }
+
+                        sum += value;
+                    }
+
+                    if (sum == 2)
+                    {
+                        cells[tempCol, tempRow].current = currentPlayer;
+                        board.UpdateCellVisual(tempCol, tempRow, currentPlayer);
+                        EndTurn();
+                        break;
+                    }
+                    escapeVal = 1;
+                }
+                escapeVal = 0;
+                while (currentPlayer == PlayerOption.O && escapeVal != 1)
+                {
+                    // top right to bottom left
+                    sum = 0;
+                    for (int i = 0; i < Rows; i++)
+                    {
+                        int value = 0;
+
+                        if (cells[Columns - 1 - i, i].current == PlayerOption.X)
+                            value = 1;
+                        else if (cells[Columns - 1 - i, i].current == PlayerOption.O)
+                            value = -1;
+                        else if (cells[Columns - 1 - i, i].current == PlayerOption.NONE)
+                        {
+                            tempRow = i;
+                            tempCol = (Columns - 1 - i);
+                        }
+
+                        sum += value;
+                    }
+
+                    if (sum == 2)
+                    {
+                        cells[tempCol, tempRow].current = currentPlayer;
+                        board.UpdateCellVisual(tempCol, tempRow, currentPlayer);
+                        EndTurn();
+                        break;
+                    }
+                    escapeVal = 1;
+                }
+                escapeVal = 0;
+                break;
+            case 9:
+                sum = 0;
+                tempRow = 0;
+                tempCol = 0;
+                escapeVal = 0;
+                while (currentPlayer == PlayerOption.X && escapeVal != 1)
+                {
+                    //tries to win
+                    // check rows
+                    for (int i = 0; i < Rows; i++)
+                    {
+                        sum = 0;
+                        for (int j = 0; j < Columns; j++)
+                        {
+                            var value = 0;
+                            if (cells[j, i].current == PlayerOption.X)
+                                value = 1;
+                            else if (cells[j, i].current == PlayerOption.O)
+                                value = -1;
+                            else if (cells[j, i].current == PlayerOption.NONE)
+                            {
+                                tempRow = i;
+                                tempCol = j;
+                            }
+
+                            sum += value;
+                        }
+
+                        if (sum == 2)
+                        {
+                            cells[tempCol, tempRow].current = currentPlayer;
+                            board.UpdateCellVisual(tempCol, tempRow, currentPlayer);
+                            EndTurn();
+                            break;
+                        }
+
+                    }
+                    escapeVal = 1;
+                }
+                escapeVal = 0;
+                while (currentPlayer == PlayerOption.X && escapeVal != 1)
+                {
+                    // check columns
+                    for (int j = 0; j < Columns; j++)
+                    {
+                        sum = 0;
+                        for (int i = 0; i < Rows; i++)
+                        {
+                            var value = 0;
+                            if (cells[j, i].current == currentPlayer)
+                                value = 1;
+                            else if (cells[j, i].current == PlayerOption.O)
+                                value = -1;
+                            else if (cells[j, i].current == PlayerOption.NONE)
+                            {
+                                tempRow = i;
+                                tempCol = j;
+                            }
+
+                            sum += value;
+                        }
+
+                        if (sum == 2)
+                        {
+                            cells[tempCol, tempRow].current = currentPlayer;
+                            board.UpdateCellVisual(tempCol, tempRow, currentPlayer);
+                            EndTurn();
+                            break;
+                        }
+
+                    }
+                    escapeVal = 1;
+                }
+                escapeVal = 0;
+                while (currentPlayer == PlayerOption.X && escapeVal != 1)
+                {
+                    // check diagonals
+                    // top left to bottom right
+                    sum = 0;
+                    for (int i = 0; i < Rows; i++)
+                    {
+                        int value = 0;
+                        if (cells[i, i].current == PlayerOption.X)
+                            value = 1;
+                        else if (cells[i, i].current == PlayerOption.O)
+                            value = -1;
+                        else if (cells[i, i].current == PlayerOption.NONE)
+                        {
+                            tempRow = i;
+                            tempCol = i;
+                        }
+
+                        sum += value;
+                    }
+
+                    if (sum == 2)
+                    {
+                        cells[tempCol, tempRow].current = currentPlayer;
+                        board.UpdateCellVisual(tempCol, tempRow, currentPlayer);
+                        EndTurn();
+                        break;
+                    }
+                    escapeVal = 1;
+                }
+                escapeVal = 0;
+                while (currentPlayer == PlayerOption.X && escapeVal != 1)
+                {
+                    // top right to bottom left
+                    sum = 0;
+                    for (int i = 0; i < Rows; i++)
+                    {
+                        int value = 0;
+
+                        if (cells[Columns - 1 - i, i].current == PlayerOption.X)
+                            value = 1;
+                        else if (cells[Columns - 1 - i, i].current == PlayerOption.O)
+                            value = -1;
+                        else if (cells[Columns - 1 - i, i].current == PlayerOption.NONE)
+                        {
+                            tempRow = i;
+                            tempCol = (Columns - 1 - i);
+                        }
+
+                        sum += value;
+                    }
+
+                    if (sum == 2)
+                    {
+                        cells[tempCol, tempRow].current = currentPlayer;
+                        board.UpdateCellVisual(tempCol, tempRow, currentPlayer);
+                        EndTurn();
+                        break;
+                    }
+                    escapeVal = 1;
+                }
+                escapeVal = 0;
+                while (currentPlayer == PlayerOption.X && escapeVal != 1)
+                {
+                    // ties if can't win
+                    // check rows
+                    for (int i = 0; i < Rows; i++)
+                    {
+                        sum = 0;
+                        for (int j = 0; j < Columns; j++)
+                        {
+                            var value = 0;
+                            if (cells[j, i].current == PlayerOption.X)
+                                value = 1;
+                            else if (cells[j, i].current == PlayerOption.O)
+                                value = -1;
+                            else if (cells[j, i].current == PlayerOption.NONE)
+                            {
+                                tempRow = i;
+                                tempCol = j;
+                            }
+
+                            sum += value;
+                        }
+
+                        if (sum == -2)
+                        {
+                            cells[tempCol, tempRow].current = currentPlayer;
+                            board.UpdateCellVisual(tempCol, tempRow, currentPlayer);
+                            EndTurn();
+                            break;
+                        }
+
+                    }
+                    escapeVal = 1;
+                }
+                escapeVal = 0;
+                while (currentPlayer == PlayerOption.X && escapeVal != 1)
+                {
+                    // check columns
+                    for (int j = 0; j < Columns; j++)
+                    {
+                        sum = 0;
+                        for (int i = 0; i < Rows; i++)
+                        {
+                            var value = 0;
+                            if (cells[j, i].current == PlayerOption.X)
+                                value = 1;
+                            else if (cells[j, i].current == PlayerOption.O)
+                                value = -1;
+                            else if (cells[j, i].current == PlayerOption.NONE)
+                            {
+                                tempRow = i;
+                                tempCol = j;
+                            }
+
+                            sum += value;
+                        }
+
+                        if (sum == -2)
+                        {
+                            cells[tempCol, tempRow].current = currentPlayer;
+                            board.UpdateCellVisual(tempCol, tempRow, currentPlayer);
+                            EndTurn();
+                            break;
+                        }
+
+                    }
+                    escapeVal = 1;
+                }
+                escapeVal = 0;
+                while (currentPlayer == PlayerOption.X && escapeVal != 1)
+                {
+                    // check diagonals
+                    // top left to bottom right
+                    sum = 0;
+                    for (int i = 0; i < Rows; i++)
+                    {
+                        int value = 0;
+                        if (cells[i, i].current == PlayerOption.X)
+                            value = 1;
+                        else if (cells[i, i].current == PlayerOption.O)
+                            value = -1;
+                        else if (cells[i, i].current == PlayerOption.NONE)
+                        {
+                            tempRow = i;
+                            tempCol = i;
+                        }
+
+                        sum += value;
+                    }
+
+                    if (sum == -2)
+                    {
+                        cells[tempCol, tempRow].current = currentPlayer;
+                        board.UpdateCellVisual(tempCol, tempRow, currentPlayer);
+                        EndTurn();
+                        break;
+                    }
+                    escapeVal = 1;
+                }
+                escapeVal = 0;
+                while (currentPlayer == PlayerOption.X && escapeVal != 1)
+                {
+                    // top right to bottom left
+                    sum = 0;
+                    for (int i = 0; i < Rows; i++)
+                    {
+                        int value = 0;
+
+                        if (cells[Columns - 1 - i, i].current == PlayerOption.X)
+                            value = 1;
+                        else if (cells[Columns - 1 - i, i].current == PlayerOption.O)
+                            value = -1;
+                        else if (cells[Columns - 1 - i, i].current == PlayerOption.NONE)
+                        {
+                            tempRow = i;
+                            tempCol = (Columns - 1 - i);
+                        }
+
+                        sum += value;
+                    }
+
+                    if (sum == -2)
+                    {
+                        cells[tempCol, tempRow].current = currentPlayer;
+                        board.UpdateCellVisual(tempCol, tempRow, currentPlayer);
+                        EndTurn();
+                        break;
+                    }
+                    escapeVal = 1;
+                }
+                escapeVal = 0;
+                while ((currentPlayer == PlayerOption.X) && escapeVal != 1) //places X in final space
+                {
+                    for (int i = 0; i < Rows; i++)
+                    {
+                        for (int j = 0; j < Columns; j++)
+                        {
+                            if (cells[j, i].current == PlayerOption.NONE)
+                            {
+                                cells[j, i].current = PlayerOption.X; 
+                                board.UpdateCellVisual(j, i, currentPlayer);
+                                EndTurn();
+                                break;
+                            }
+                        }
+                    }
+                    escapeVal = 1;
                 }
                 break;
         }
