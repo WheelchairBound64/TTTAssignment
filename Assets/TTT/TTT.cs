@@ -44,7 +44,7 @@ public class TTT : MonoBehaviour
         Debug.Log(randomNum);
         switch (turns)
         {
-            case 1:
+            case 1: //puts X on a corner (randomly)
                 if(randomNum == 1 || randomNum == 2)
                 {
                     cells[0, 0].current = currentPlayer; //top left corner
@@ -70,7 +70,7 @@ public class TTT : MonoBehaviour
                     EndTurn();
                 }
                 break;
-            case 2:
+            case 2: // puts O in center if open , if not it puts O in a corner randomly
                 if (cells[1, 1].current == PlayerOption.NONE)
                 {
                     cells[1, 1].current = currentPlayer;
@@ -106,7 +106,7 @@ public class TTT : MonoBehaviour
                 }
                 break;
             case 3:
-                if (cells[1, 1].current == PlayerOption.O)
+                if (cells[1, 1].current == PlayerOption.O)  // if O owns center...
                 {
                     if (cells[0, 0].current == PlayerOption.X) //top left
                     {
@@ -126,21 +126,409 @@ public class TTT : MonoBehaviour
                         board.UpdateCellVisual(0, 2, currentPlayer);
                         EndTurn();
                     }
-                    else
+                    else //bottom right
                     {
                         cells[0, 0].current = currentPlayer; //top left
                         board.UpdateCellVisual(0, 0, currentPlayer);
                         EndTurn();
                     }
                 }
-                else if (cells[0, 1].current == PlayerOption.O || cells[1, 0].current == PlayerOption.O || cells[1, 2].current == PlayerOption.O || cells[2, 1].current == PlayerOption.O) //left mid, top mid, bottom mid, right mid: in that order 
+                else if ((cells[0, 1].current == PlayerOption.O || cells[1, 0].current == PlayerOption.O || cells[1, 2].current == PlayerOption.O || cells[2, 1].current == PlayerOption.O) && (cells[0, 0].current == PlayerOption.X || cells[0, 2].current == PlayerOption.X || cells[2, 0].current == PlayerOption.X || cells[2, 2].current == PlayerOption.X)) //left mid, top mid, bottom mid, right mid: in that order 
                 {
                     cells[1,1].current = currentPlayer;
                     board.UpdateCellVisual(1, 1, currentPlayer);
                     EndTurn();
+                } // if O is on sides AND X is on a corner...
+                else if ((cells[0, 1].current == PlayerOption.X || cells[1, 0].current == PlayerOption.X || cells[1, 2].current == PlayerOption.X || cells[2, 1].current == PlayerOption.X) && (cells[0, 0].current == PlayerOption.O || cells[0, 2].current == PlayerOption.O || cells[2, 0].current == PlayerOption.O || cells[2, 2].current == PlayerOption.O))
+                {
+                    cells[1, 1].current = currentPlayer;
+                    board.UpdateCellVisual(1, 1, currentPlayer);
+                    EndTurn();
+                } // X on sides, O in corners...
+                else if ((cells[0,0].current == PlayerOption.X || cells[0, 2].current == PlayerOption.X || cells[2, 0].current == PlayerOption.X || cells[2, 2].current == PlayerOption.X) && (cells[0, 0].current == PlayerOption.O || cells[2, 0].current == PlayerOption.O || cells[0, 2].current == PlayerOption.O || cells[2, 2].current == PlayerOption.O)) // if X AND O are on corners...
+                {
+                    if (cells[0,0].current == PlayerOption.X) //top left
+                    {
+                        if (cells[0, 2].current == PlayerOption.O)
+                        {
+                            cells[2, 0].current = currentPlayer;
+                            board.UpdateCellVisual(2, 0, currentPlayer);
+                            EndTurn();
+                        }
+                        else if (cells[2, 0].current == PlayerOption.O)
+                        {
+                            cells[0,2].current = currentPlayer;
+                            board.UpdateCellVisual(0, 2, currentPlayer);
+                            EndTurn();
+                        }
+                        else
+                        {
+                            if (randomNum % 2 == 0)
+                            {
+                                cells[0, 2].current = currentPlayer;
+                                board.UpdateCellVisual (0, 2, currentPlayer);
+                                EndTurn();
+                            }
+                            else
+                            {
+                                cells[2,0].current = currentPlayer;
+                                board.UpdateCellVisual(2, 0, currentPlayer);
+                                EndTurn();
+                            }
+                        }
+                    }
+                    else if (cells[0, 2].current == PlayerOption.X) //bottom left
+                    {
+                        if (cells[0, 0].current == PlayerOption.O)
+                        {
+                            cells[2, 2].current = currentPlayer;
+                            board.UpdateCellVisual(2, 2, currentPlayer);
+                            EndTurn();
+                        }
+                        else if (cells[2, 2].current == PlayerOption.O)
+                        {
+                            cells[0, 0].current = currentPlayer;
+                            board.UpdateCellVisual(0, 0, currentPlayer);
+                            EndTurn();
+                        }
+                        else
+                        {
+                            if (randomNum % 2 == 0)
+                            {
+                                cells[0, 0].current = currentPlayer;
+                                board.UpdateCellVisual(0, 0, currentPlayer);
+                                EndTurn();
+                            }
+                            else
+                            {
+                                cells[2, 2].current = currentPlayer;
+                                board.UpdateCellVisual(2, 2, currentPlayer);
+                                EndTurn();
+                            }
+                        }
+                    }
+                    else if (cells[2, 0].current == PlayerOption.X) //top right
+                    {
+                        if (cells[0, 0].current == PlayerOption.O)
+                        {
+                            cells[2, 2].current = currentPlayer;
+                            board.UpdateCellVisual(2, 2, currentPlayer);
+                            EndTurn();
+                        }
+                        else if (cells[2, 2].current == PlayerOption.O)
+                        {
+                            cells[0, 0].current = currentPlayer;
+                            board.UpdateCellVisual(0, 0, currentPlayer);
+                            EndTurn();
+                        }
+                        else
+                        {
+                            if (randomNum % 2 == 0)
+                            {
+                                cells[0, 0].current = currentPlayer;
+                                board.UpdateCellVisual(0, 0, currentPlayer);
+                                EndTurn();
+                            }
+                            else
+                            {
+                                cells[2, 2].current = currentPlayer;
+                                board.UpdateCellVisual(2, 2, currentPlayer);
+                                EndTurn();
+                            }
+                        }
+                    }
+                    else //bottom right
+                    {
+                        if (cells[0, 2].current == PlayerOption.O)
+                        {
+                            cells[2, 0].current = currentPlayer;
+                            board.UpdateCellVisual(2, 0, currentPlayer);
+                            EndTurn();
+                        }
+                        else if (cells[2, 0].current == PlayerOption.O)
+                        {
+                            cells[0, 2].current = currentPlayer;
+                            board.UpdateCellVisual(0, 2, currentPlayer);
+                            EndTurn();
+                        }
+                        else
+                        {
+                            if (randomNum % 2 == 0)
+                            {
+                                cells[0, 2].current = currentPlayer;
+                                board.UpdateCellVisual(0, 2, currentPlayer);
+                                EndTurn();
+                            }
+                            else
+                            {
+                                cells[2, 0].current = currentPlayer;
+                                board.UpdateCellVisual(2, 0, currentPlayer);
+                                EndTurn();
+                            }
+                        }
+                    }
+                }
+                else if ((cells[0, 1].current == PlayerOption.X || cells[1, 0].current == PlayerOption.X || cells[1, 2].current == PlayerOption.X || cells[2, 1].current == PlayerOption.X) && (cells[0, 1].current == PlayerOption.O || cells[1, 0].current == PlayerOption.O || cells[1, 2].current == PlayerOption.O || cells[2, 1].current == PlayerOption.O)) // if X AND O are on sides...
+                {
+                    if (cells[0,1].current == PlayerOption.X)
+                    {
+                        if (cells[1,0].current == PlayerOption.O)
+                        {
+                            cells[0, 0].current = PlayerOption.X;
+                            board.UpdateCellVisual(0,0,currentPlayer);
+                            EndTurn();
+                        }
+                        else if (cells[1,2].current == PlayerOption.O)
+                        {
+                            cells[0, 2].current = PlayerOption.X;
+                            board.UpdateCellVisual(0, 2, currentPlayer);
+                            EndTurn();
+                        }
+                        else
+                        {
+                            if(randomNum % 2 == 0)
+                            {
+                                cells[0,0].current = PlayerOption.X;
+                                board.UpdateCellVisual(0,0,currentPlayer);
+                                EndTurn();
+                            }
+                            else
+                            {
+                                cells[0,2].current = PlayerOption.X;
+                                board.UpdateCellVisual(0,2,currentPlayer);
+                                EndTurn();
+                            }
+                        }
+                    }
+                    else if (cells[1, 0].current == PlayerOption.X)
+                    {
+                        if (cells[0, 1].current == PlayerOption.O)
+                        {
+                            cells[0, 0].current = PlayerOption.X;
+                            board.UpdateCellVisual(0, 0, currentPlayer);
+                            EndTurn();
+                        }
+                        else if (cells[2, 1].current == PlayerOption.O)
+                        {
+                            cells[2, 0].current = PlayerOption.X;
+                            board.UpdateCellVisual(2, 0, currentPlayer);
+                            EndTurn();
+                        }
+                        else
+                        {
+                            if (randomNum % 2 == 0)
+                            {
+                                cells[0, 0].current = PlayerOption.X;
+                                board.UpdateCellVisual(0, 0, currentPlayer);
+                                EndTurn();
+                            }
+                            else
+                            {
+                                cells[2, 0].current = PlayerOption.X;
+                                board.UpdateCellVisual(2, 0, currentPlayer);
+                                EndTurn();
+                            }
+                        }
+                    }
+                    else if (cells[2, 1].current == PlayerOption.X)
+                    {
+                        if (cells[1, 0].current == PlayerOption.O)
+                        {
+                            cells[2, 0].current = PlayerOption.X;
+                            board.UpdateCellVisual(2, 0, currentPlayer);
+                            EndTurn();
+                        }
+                        else if (cells[1, 2].current == PlayerOption.O)
+                        {
+                            cells[2, 2].current = PlayerOption.X;
+                            board.UpdateCellVisual(2, 2, currentPlayer);
+                            EndTurn();
+                        }
+                        else
+                        {
+                            if (randomNum % 2 == 0)
+                            {
+                                cells[2, 0].current = PlayerOption.X;
+                                board.UpdateCellVisual(2, 0, currentPlayer);
+                                EndTurn();
+                            }
+                            else
+                            {
+                                cells[2, 2].current = PlayerOption.X;
+                                board.UpdateCellVisual(2, 2, currentPlayer);
+                                EndTurn();
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (cells[0, 1].current == PlayerOption.O)
+                        {
+                            cells[0, 2].current = PlayerOption.X;
+                            board.UpdateCellVisual(0, 2, currentPlayer);
+                            EndTurn();
+                        }
+                        else if (cells[2, 1].current == PlayerOption.O)
+                        {
+                            cells[2, 2].current = PlayerOption.X;
+                            board.UpdateCellVisual(2, 2, currentPlayer);
+                            EndTurn();
+                        }
+                        else
+                        {
+                            if (randomNum % 2 == 0)
+                            {
+                                cells[0, 2].current = PlayerOption.X;
+                                board.UpdateCellVisual(0, 2, currentPlayer);
+                                EndTurn();
+                            }
+                            else
+                            {
+                                cells[2, 2].current = PlayerOption.X;
+                                board.UpdateCellVisual(2, 2, currentPlayer);
+                                EndTurn();
+                            }
+                        }
+                    }
                 }
                 break;
-
+            case 4:
+                if (cells[1,1].current == PlayerOption.O && ((cells[0,0].current == PlayerOption.X && cells[2,2].current == PlayerOption.X) || (cells[0,2].current == PlayerOption.X && cells[2,0].current == PlayerOption.X))) 
+                {
+                    if (randomNum == 1 || randomNum == 2)
+                    {
+                        cells[1, 0].current = currentPlayer;
+                        board.UpdateCellVisual(1,0,currentPlayer);
+                        EndTurn();
+                    }
+                    else if (randomNum == 3 || randomNum == 4)
+                    {
+                        cells[2,1].current = currentPlayer;
+                        board.UpdateCellVisual (2, 1, currentPlayer);
+                        EndTurn();
+                    }
+                    else if (randomNum == 5 || randomNum == 6)
+                    {
+                        cells[1, 2].current = currentPlayer;
+                        board.UpdateCellVisual(1,2,currentPlayer);
+                        EndTurn();
+                    }
+                    else
+                    {
+                        cells[0, 1].current = currentPlayer;
+                        board.UpdateCellVisual(0, 1, currentPlayer);
+                        EndTurn();
+                    }
+                }
+                else if (cells[0,0].current == PlayerOption.X && cells[1,0].current == PlayerOption.X && cells[2,0].current == PlayerOption.NONE)
+                {
+                    cells[2, 0].current = currentPlayer;
+                    board.UpdateCellVisual(2,0,currentPlayer);
+                    EndTurn();
+                }
+                else if (cells[0, 0].current == PlayerOption.X && cells[1, 0].current == PlayerOption.NONE && cells[2, 0].current == PlayerOption.X)
+                {
+                    cells[1,0].current = currentPlayer;
+                    board.UpdateCellVisual(1,0,currentPlayer);
+                    EndTurn();
+                }
+                else if (cells[0, 0].current == PlayerOption.NONE && cells[1, 0].current == PlayerOption.X && cells[2, 0].current == PlayerOption.X)
+                {
+                    cells[0, 0].current = currentPlayer;
+                    board.UpdateCellVisual(0, 0, currentPlayer);
+                    EndTurn();
+                }
+                else if (cells[0, 1].current == PlayerOption.NONE && cells[1, 1].current == PlayerOption.X && cells[2, 1].current == PlayerOption.X)
+                {
+                    cells[0, 1].current = currentPlayer;
+                    board.UpdateCellVisual(0, 1, currentPlayer);
+                    EndTurn();
+                }
+                else if (cells[0, 1].current == PlayerOption.X && cells[1, 1].current == PlayerOption.NONE && cells[2, 1].current == PlayerOption.X)
+                {
+                    cells[1, 1].current = currentPlayer;
+                    board.UpdateCellVisual(1, 1, currentPlayer);
+                    EndTurn();
+                }
+                else if (cells[0, 1].current == PlayerOption.X && cells[1, 1].current == PlayerOption.X && cells[2, 1].current == PlayerOption.NONE)
+                {
+                    cells[2, 1].current = currentPlayer;
+                    board.UpdateCellVisual(2, 1, currentPlayer);
+                    EndTurn();
+                }
+                else if (cells[0, 2].current == PlayerOption.NONE && cells[1, 2].current == PlayerOption.X && cells[2, 2].current == PlayerOption.X)
+                {
+                    cells[0, 2].current = currentPlayer;
+                    board.UpdateCellVisual(0, 2, currentPlayer);
+                    EndTurn();
+                }
+                else if (cells[0, 2].current == PlayerOption.X && cells[1, 2].current == PlayerOption.NONE && cells[2, 2].current == PlayerOption.X)
+                {
+                    cells[1, 2].current = currentPlayer;
+                    board.UpdateCellVisual(1, 2, currentPlayer);
+                    EndTurn();
+                }
+                else if (cells[0, 2].current == PlayerOption.X && cells[1, 2].current == PlayerOption.X && cells[2, 2].current == PlayerOption.NONE)
+                {
+                    cells[2, 2].current = currentPlayer;
+                    board.UpdateCellVisual(2, 2, currentPlayer);
+                    EndTurn();
+                }
+                else if (cells[0, 0].current == PlayerOption.NONE && cells[0, 1].current == PlayerOption.X && cells[0, 2].current == PlayerOption.X)
+                {
+                    cells[0, 0].current = currentPlayer;
+                    board.UpdateCellVisual(0, 0, currentPlayer);
+                    EndTurn();
+                }
+                else if (cells[0, 0].current == PlayerOption.X && cells[0, 1].current == PlayerOption.NONE && cells[0, 2].current == PlayerOption.X)
+                {
+                    cells[0, 1].current = currentPlayer;
+                    board.UpdateCellVisual(0, 1, currentPlayer);
+                    EndTurn();
+                }
+                else if (cells[0, 0].current == PlayerOption.X && cells[0, 1].current == PlayerOption.X && cells[0, 2].current == PlayerOption.NONE)
+                {
+                    cells[0, 2].current = currentPlayer;
+                    board.UpdateCellVisual(0, 2, currentPlayer);
+                    EndTurn();
+                }
+                else if (cells[1, 0].current == PlayerOption.X && cells[1, 1].current == PlayerOption.X && cells[1, 2].current == PlayerOption.NONE)
+                {
+                    cells[1, 2].current = currentPlayer;
+                    board.UpdateCellVisual(1, 2, currentPlayer);
+                    EndTurn();
+                }
+                else if (cells[1, 0].current == PlayerOption.X && cells[1, 1].current == PlayerOption.NONE && cells[1, 2].current == PlayerOption.X)
+                {
+                    cells[1, 1].current = currentPlayer;
+                    board.UpdateCellVisual(1, 1, currentPlayer);
+                    EndTurn();
+                }
+                else if (cells[1, 0].current == PlayerOption.NONE && cells[1, 1].current == PlayerOption.X && cells[1, 2].current == PlayerOption.X)
+                {
+                    cells[1, 0].current = currentPlayer;
+                    board.UpdateCellVisual(1, 0, currentPlayer);
+                    EndTurn();
+                }
+                else if (cells[2, 0].current == PlayerOption.X && cells[2, 1].current == PlayerOption.X && cells[2, 2].current == PlayerOption.NONE)
+                {
+                    cells[2, 2].current = currentPlayer;
+                    board.UpdateCellVisual(2, 2, currentPlayer);
+                    EndTurn();
+                }
+                else if (cells[2, 0].current == PlayerOption.X && cells[2, 1].current == PlayerOption.NONE && cells[2, 2].current == PlayerOption.X)
+                {
+                    cells[2, 1].current = currentPlayer;
+                    board.UpdateCellVisual(2, 1, currentPlayer);
+                    EndTurn();
+                }
+                else if (cells[2, 0].current == PlayerOption.NONE && cells[2, 1].current == PlayerOption.X && cells[2, 2].current == PlayerOption.X)
+                {
+                    cells[2, 2].current = currentPlayer;
+                    board.UpdateCellVisual(2, 2, currentPlayer);
+                    EndTurn();
+                }
+                break;
         }
     }
 
